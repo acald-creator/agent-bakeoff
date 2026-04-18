@@ -47,3 +47,9 @@ coverage/
 builds/*/dist/
 builds/*/node_modules/
 builds/*/pnpm-lock.yaml
+
+# Act 2 instrumented (Round 2) build artifacts
+builds-instrumented/*/dist/
+builds-instrumented/*/node_modules/
+builds-instrumented/_template/dist/
+builds-instrumented/_template/node_modules/
