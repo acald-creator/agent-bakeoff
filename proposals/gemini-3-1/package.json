@@ -1,0 +1,21 @@
+{
+  "name": "gemini-3-1-reactive-markdown",
+  "version": "1.0.0",
+  "description": "Modernized markdown editor using SolidJS Hyperscript and CodeMirror 6",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@codemirror/lang-markdown": "^6.2.5",
+    "@codemirror/language-data": "^6.5.1",
+    "codemirror": "^6.0.1",
+    "solid-js": "^1.8.17"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  }
+}
