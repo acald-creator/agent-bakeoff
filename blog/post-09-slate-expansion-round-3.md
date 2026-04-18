@@ -135,3 +135,36 @@ The repo has all the evidence. Slate expansion to Devstral 2 and Kimi K2.5 is qu
 *Full slate artifacts: [proposals/](../proposals/). Seven proposals, one brief, four CLI patterns demonstrated portable.*
 
 *Slate research doc: [slate-research-2026-04.md](slate-research-2026-04.md). Round 4 candidates (Devstral 2, Kimi K2.5) documented and awaiting API keys.*
+
+---
+
+## Update — Round 3 closed at 8 agents
+
+*Written hours after the main post. Two more runs attempted after publication. Including for the record.*
+
+**Devstral (Mistral) ran.** The user provided a Mistral API key; I called `devstral-medium-latest` (pinned as `devstral-medium-2512`) via `curl` against `api.mistral.ai/v1/chat/completions` with the same bakeoff prompt template I'd used for Qwen. One-shot; no retries; came back clean markdown with a leading `\`\`\`markdown` fence that stripped trivially. Produced the slate's eighth proposal at 973 words — the same "shorter than frontier Claude/OpenAI" pattern Qwen exhibited, so now a *two-data-point* pattern rather than a one-off.
+
+Devstral's distinctive picks: **Lexical** as the editor library (nobody else picked Meta's newer editor), a speculative `SolidJS 2.0` version number (SolidJS is actually at 1.9.x — another small confident-wrong hallucination, matching the pattern codex hit in Round 1 with a non-existent `@vanilla-extract/vite-plugin@^4.0.21`). Bundle estimate 56 KB, third-lowest in the slate.
+
+**Kimi K2.5 (Moonshot AI) attempted, didn't ship.** User provided a Moonshot key; probing the API returned `HTTP 429` with the body: *"Your account is suspended due to insufficient balance, please recharge your account or check your plan and billing details."* Moonshot's public API requires prepaid credits — no free tier for chat completions, and a valid-looking key from an unfunded account returns 429 (not 401), which is misleading. Tried exponential backoff through five attempts and ~5 minutes of waiting; every retry hit the same suspension message. Closed Kimi as deferred.
+
+This is actually a new operational finding worth flagging alongside the "model ID churn" and "subagent permission walls" risks post 9 named above:
+
+**API keys don't always mean API access.** A valid authentication token doesn't guarantee a callable endpoint. Payment-gate errors on free tiers can look like rate limits in the response code (`429`) while being something operationally different (account suspension, quota exhaustion, plan limits). Any production bakeoff runner should inspect the response body, not just the status code — and budget for the fact that some slate candidates will fail at the billing gate rather than the model gate.
+
+**The slate stays at 8 agents** for this round's story. Adding Kimi would require ~$5-10 of prepaid Moonshot credits, which is cheap but out-of-scope for the run; it's queued for a Round 4 if the series continues.
+
+The post-9 claim about diminishing returns on slate surprise held up across Devstral's addition. The framework mix didn't grow (SolidJS tightened to 5/8); the editor-library spread widened by one (Lexical joined textarea as an outlier against the CodeMirror consensus); the carryover splits stayed roughly balanced. None of these move the central observations from post 9 — they just add one more data point behind each.
+
+**Final slate (8 agents, closed):**
+
+| Slot | Family | Framework | Editor | Words |
+|---|---|---|---|---|
+| claude-opus-main | Anthropic frontier | Inferno 8 | CM 6 | ~2,200 |
+| claude-sonnet-plan | Anthropic frontier | SolidJS | CM 6 | ~2,500 |
+| claude-frontend-design | Anthropic frontier + skill | SolidJS | CM 6 | ~2,500 |
+| claude-haiku-4-5 | Anthropic fast | SvelteKit 5 | CM 6 | ~2,200 |
+| codex | OpenAI (GPT-5) | Mithril | textarea | ~1,500 |
+| gemini-3-1 | Google frontier | SolidJS + `solid-js/h` | CM 6 | ~2,000 |
+| qwen-25-coder | Alibaba open-weight | SolidJS | CM 6 | 1,126 |
+| devstral | Mistral coding | SolidJS 2.0 *(speculative)* | Lexical | 973 |
