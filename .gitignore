@@ -42,3 +42,8 @@ coverage/
 
 # Codex CLI artifacts
 .codex
+
+# Act 2 build artifacts (measured into notes, not stored)
+builds/*/dist/
+builds/*/node_modules/
+builds/*/pnpm-lock.yaml

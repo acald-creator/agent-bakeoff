@@ -1,0 +1,106 @@
+import { createGlobalTheme } from '@vanilla-extract/css';
+
+export const tokens = createGlobalTheme(':root', {
+  color: {
+    bg:           '#F5F0E8',
+    bgSidebar:    '#EDE8DF',
+    bgActive:     '#E8DFD0',
+    bgHover:      '#F0EBE2',
+    ink:          '#1A1510',
+    inkSecondary: '#5C5248',
+    inkFaint:     '#9E9282',
+    inkGhost:     '#C8C0B0',
+    accent:       '#B8311F',
+    accentHover:  '#9E2A19',
+    accentFaint:  '#F2DDD9',
+    border:       '#D8D0C0',
+    borderStrong: '#B8B0A0',
+    dirty:        '#B8311F',
+    selection:    '#E8C9C4',
+    cursorLine:   '#ECE6DA',
+  },
+
+  font: {
+    display: '"Playfair Display", "Georgia", "Times New Roman", serif',
+    prose:   '"Literata", "Georgia", "Book Antiqua", serif',
+    mono:    '"Fira Code", "Cascadia Code", "Consolas", monospace',
+    ui:      '"DM Sans", "Helvetica Neue", system-ui, sans-serif',
+  },
+
+  fontSize: {
+    xs:   '0.64rem',
+    sm:   '0.8rem',
+    md:   '1rem',
+    lg:   '1.25rem',
+    xl:   '1.563rem',
+    '2xl':'1.953rem',
+    '3xl':'2.441rem',
+  },
+
+  lineHeight: {
+    tight:   '1.25',
+    normal:  '1.5',
+    relaxed: '1.7',
+    display: '1.2',
+  },
+
+  fontWeight: {
+    regular: '400',
+    medium:  '500',
+    semibold:'600',
+    bold:    '700',
+  },
+
+  size: {
+    sidebarWidth:    '280px',
+    sidebarMinWidth: '200px',
+    editorMaxWidth:  '680px',
+    editorPaddingX:  '2.5rem',
+    editorPaddingY:  '3rem',
+  },
+
+  space: {
+    '0':  '0',
+    '1':  '0.25rem',
+    '2':  '0.5rem',
+    '3':  '0.75rem',
+    '4':  '1rem',
+    '5':  '1.25rem',
+    '6':  '1.5rem',
+    '8':  '2rem',
+    '10': '2.5rem',
+    '12': '3rem',
+    '16': '4rem',
+  },
+
+  radius: {
+    none: '0',
+    sm:   '2px',
+    md:   '4px',
+    lg:   '8px',
+    full: '9999px',
+  },
+
+  shadow: {
+    sm:  '0 1px 3px rgba(26, 21, 16, 0.06)',
+    md:  '0 2px 8px rgba(26, 21, 16, 0.10)',
+    lg:  '0 4px 20px rgba(26, 21, 16, 0.14)',
+  },
+
+  motion: {
+    durationFast:   '120ms',
+    durationMedium: '200ms',
+    durationSlow:   '350ms',
+    easeOut:  'cubic-bezier(0.0, 0.0, 0.2, 1)',
+    easeIn:   'cubic-bezier(0.4, 0.0, 1.0, 1)',
+    easeInOut:'cubic-bezier(0.4, 0.0, 0.2, 1)',
+  },
+
+  zIndex: {
+    base:    '0',
+    above:   '10',
+    sidebar: '20',
+    overlay: '30',
+    modal:   '40',
+  },
+});

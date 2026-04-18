@@ -1,6 +1,6 @@
 # Blog Series — Modernizing a 2022 Inferno Todo with Multi-Agent Assessments
 
-> Working document. Lives in the baseline repo for now; will move to `agent-bakeoff` once that repo is created.
+> Working document. Lives in the `agent-bakeoff` repo (private, under acald-creator GitHub).
 
 ## New repo
 
@@ -90,3 +90,5 @@ Iterate on the brief before sending to agents — once it ships, all four runs u
 - **2026-04-18** — All four proposals in. Spot-check passed (every required schema header, carryover, action trace, bundle math present in each). Stacks: opus-main (Inferno + CM6 + hand-rolled), sonnet-plan (Solid + Zustand + CM6), frontend-design (Solid + CM6 + vanilla-extract), codex (Mithril + textarea + micromark). Three patterns: CodeMirror 6 is editor consensus (3/4); hyperscript kept by both non-default-Claude slots (opus-main + codex); bundle sizes spread 37–100 KB driven by editor lib choice.
 - **2026-04-18** — Post 4 (the verdict) drafted at [post-04-the-verdict.md](post-04-the-verdict.md). Pick: **claude-frontend-design** for Act 2's build-off, on build-off-fitness reasoning (most polish surface for time-pressure signal). Codex named as runner-up and "best pure proposal" by the brief's lenses. Opus-main self-disclosed as informed-insider, not eligible. Verdict reasoning is in the post; user can override.
 - **2026-04-18** — Posts 0–3 drafted: [post-00-why-an-agent-bakeoff.md](post-00-why-an-agent-bakeoff.md) (framing), [post-01-whats-in-the-box.md](post-01-whats-in-the-box.md) (baseline tour), [post-02-the-brief.md](post-02-the-brief.md) (brief evolution v1.0→v1.4 with both pilot critiques), [post-03-the-proposals.md](post-03-the-proposals.md) (mega-post with one section per agent, on each proposal's own terms). All forward references in post 4 now resolve. Posts 5–7 still wait on Act 2.
+- **2026-04-18** — Repo `agent-bakeoff` created (private, under acald-creator GitHub account). Initial commit `fd959bc9` includes baseline snapshot + blog + 4 proposals + archived pilots. Author/committer set to `Antonette Caldwell <18711313+acald-creator@users.noreply.github.com>` (GitHub noreply for privacy + correct profile attribution).
+- **2026-04-18** — Act 2 setup locked. Builder: same agent that authored the chosen proposal (Claude Sonnet via subagent + `frontend-design` skill). Budget calibration: 1-day = ~30 min / ~25 iterations; 3-day = ~90 min / ~75 iterations; 1-week = ~4 hr / ~150 iterations. Operational rules at [act-2-rules.md](act-2-rules.md). Independent runs, no peeking, output to `builds/<budget>/`. Kicking off 1-day build first.
