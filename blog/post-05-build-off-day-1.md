@@ -1,165 +1,107 @@
-# The Build-Off + 1-Day Build — Post 5
+# The Build-Off + 1-Day Build
 
-*Act 2 starts here. Same chosen design, three different time budgets, same agent across all three. This post is the rules and the first build.*
+Chosen design: `claude-frontend-design`. Same agent configuration (Claude Sonnet via subagent + `frontend-design` skill). Fresh context for each run. Three budgets — 1-day, 3-day, 1-week.
 
----
+The original plan had the agent run its own `pnpm install` and `pnpm build`. Three permission walls killed that. Subagent permission scopes don't resolve cleanly against the primary project's settings. I patched `.claude/settings.local.json` with explicit allowlist patterns. Didn't help. Third try hit the same wall.
 
-The verdict post picked [claude-frontend-design](../proposals/claude-frontend-design/README.md) as the proposal we'd build in Act 2 — not because it scored highest on the brief's evaluation lenses (codex did), but because it had the most *polish surface* for a time-pressure comparison to show. Editorial typography, custom design tokens, vanilla-extract type system, considered motion — places where "1-day" and "1-week" would produce visibly different artifacts.
+Rather than keep iterating on the permission setup, I pivoted.
 
-The three-build plan was straightforward: same proposal, same agent configuration (Claude Sonnet subagent + the `frontend-design` skill), same fresh context for each run, three different self-paced time budgets. Then compare.
+> The agent writes code. The orchestrator runs `pnpm install` + `pnpm build` and measures the bundle.
 
-That plan survived first contact. The first-order results did not.
+A cleaner experiment design. It isolates what we're measuring (LLM coding behavior under time pressure) from what we don't care about (build infrastructure friction). The bundle-size lens is preserved. The orchestrator measures from the actual `dist/` output. The tradeoff is the agent can't see its own code run. It can inspect, reason about, spot-check, but can't run `pnpm build` and watch where errors point. That tradeoff matters in the next two posts.
 
-## The Act 2 rules, briefly
+## The rules
 
-The full rules live at [act-2-rules.md](act-2-rules.md). The compressed version:
+- Same proposal across all three runs (`claude-frontend-design`).
+- Same agent configuration. Claude Sonnet via subagent + `frontend-design` skill.
+- Fresh context per run. No memory between rounds.
+- Self-paced. Budget is a cap, not a floor. Stop when it runs out, even if features remain.
+- No peeking at sibling builds.
+- Honesty in `build-notes.md` is graded.
 
-- **Same proposal, same agent, three budgets** (1-day / 3-day / 1-week)
-- **Self-paced** — budgets are caps, not floors. The agent stops when it runs out, even if features remain.
-- **Independent runs, no peeking** — each agent gets a fresh subagent context with no memory of sibling builds. Orchestrator doesn't intervene mid-run.
-- **Honesty in `build-notes.md` is graded.** The agent writes what it did, what it cut, and a self-assessment. Inflated claims hurt the comparison post.
+Full rules at [blog/act-2-rules.md](https://github.com/acald-creator/agent-bakeoff/blob/main/blog/act-2-rules.md).
 
-The original plan had the agent run `pnpm install` and `pnpm build` itself — verify its own work, measure its own bundle. That plan broke.
+## Budget definitions
 
-## The methodology pivot
+| Budget | Wall-clock cap | Iteration cap | Expected ceiling |
+|---|---|---|---|
+| 1-day | ~30 min | ~25 turns | Working app, polish cut |
+| 3-day | ~90 min | ~75 turns | Design system wired, most polish |
+| 1-week | ~4 hr | ~150 turns | Proposal as designed |
 
-The first 1-day agent hit a Bash permission wall on `pnpm install`. So did the second. So did the third — even after I wrote `.claude/settings.local.json` with explicit allow rules for `pnpm install`, `pnpm run`, `pnpm build`, `vite`, `tsc`, and every other toolchain command the agent could plausibly need. The permission system resolves against the active session's primary project directory, and the primary project was elsewhere in my workspace. Subagents inherited the wrong scope.
+## The 1-day build
 
-Rather than continue iterating on the permission setup (which would have delayed Act 2 indefinitely), I pivoted the methodology:
+The agent stopped at 14 iterations in 12 minutes. Well under the cap. It stopped because of a permission wall during its own read-the-build-output check, not because of budget exhaustion. By design, it didn't attempt workarounds. Hit a wall, stop, document.
 
-> **The agent writes code. The orchestrator runs `pnpm install` + `pnpm build` and measures the bundle.**
+Built clean on the first verified build. The visible delta vs what happens at 3-day and 1-week.
 
-This is actually a cleaner experiment design than the original. It isolates what we're trying to measure (LLM coding behavior under time pressure) from what we don't care about (build infrastructure friction). The bundle-size lens is preserved — the orchestrator measures it from the actual `dist/` output, the way the brief defined.
+### What the agent picked
 
-The tradeoff is the agent doesn't get to *see* its own code run. It can inspect what it wrote, reason about it, spot-check line-by-line — but it can't run `pnpm build` and watch where the errors point. That tradeoff will matter a lot over the next two posts.
-
-Each build directory ends up with two notes files:
-- `build-notes.md` — the agent's self-report. What got built, what got cut, self-assessment.
-- `orchestrator-notes.md` — what the orchestrator did out-of-band. What install broke, what the measured bundle actually was, what was visible from outside the agent's perspective.
-
-Both are committed. Together they're the primary source for this post and the two that follow.
-
-## The 1-day budget
-
-- **Wall-clock cap:** ~30 minutes
-- **Iteration cap:** ~25 tool calls
-- **Expected ceiling:** working app, cut polish. Five functional verbs work; visual aesthetic is suggested, not fully realized.
-
-The 1-day agent stopped at **14 iterations in ~12 minutes.** Well under the cap. It stopped because it hit the (correctly-diagnosed) permission wall trying to verify its own build — and by design, it didn't attempt workarounds. Per the rules: hit a wall, stop, document.
-
-## What the agent picked
-
-Stack at 1-day:
-
-| Layer | Choice | vs. proposal |
+| Layer | Choice | vs proposal |
 |---|---|---|
 | Framework | SolidJS 1.9 | same |
 | Editor | CodeMirror 6 | same |
 | State | SolidJS `createStore` + `produce` | same |
-| Styling | **Plain CSS with custom properties on `:root`** | **vanilla-extract dropped** |
-| Design tokens | CSS custom properties | in-place substitute for typed tokens |
-| Build | Vite 6 | same |
+| Styling | Plain CSS + CSS custom properties on `:root` | vanilla-extract dropped |
 | Tests | None | cut |
+| Build | Vite 6 | same |
 
-Vanilla-extract was the proposal's single most distinctive technical pick — typed CSS-in-JS that compiles to static stylesheets and makes design tokens first-class TypeScript values. The agent cut it. The rationale in `build-notes.md`:
+Vanilla-extract was the proposal's most distinctive technical pick. Typed CSS-in-JS, design tokens as first-class TypeScript values. The agent dropped it with specific reasoning. From `build-notes.md`:
 
 > Dropped in favor of plain CSS to avoid the extra build plugin and reduce budget risk. Design tokens implemented as CSS custom properties on `:root` instead. The token contract is still the single source of truth; it's just `var(--color-accent)` instead of `tokens.color.accent`.
 
-That's a defensible 1-day cut. "Extra build plugin" is real risk at a 30-minute budget; a single plugin mis-configuration costs you the whole run. And the cut is honest — the agent disclosed it, named the tradeoff, and moved on.
+A defensible 1-day cut. Extra build plugin is real risk at a 30-minute budget. Plugin misconfiguration costs you the whole run. The cut is honest. Disclosed, reasoned, moved on.
 
-What it kept, in the design-POV department:
+### What survived from the design POV
+
 - Warm aged-paper palette (`#F5F0E8` background, `#1A1510` ink, `#B8311F` red accent)
 - Playfair Display for titles (editorial serif)
-- Literata for the editor body (long-form reading serif)
-- DM Sans for UI chrome
-- A dirty-state indicator (a red border accent on the active note, no pulsing animation despite the notes claiming one)
-- A 120 ms opacity crossfade on note switch
-- No topnav, no modal dialogs — "maximum negative space"
-- CodeMirror gutter hidden (no line numbers) for a cleaner writing surface
+- Literata for editor body
+- 120 ms opacity crossfade on note switch
 
-The visual character is recognizable. Not fully realized — there's no pulsing animation on the dirty dot, the `.cm-header-1` and `.cm-strong` markdown decorations are referenced in the editor theme but unverified, the mobile layout is cut — but recognizable.
+What didn't survive:
 
-## What the agent shipped
+- Pulsing animation on the dirty-state dot (claimed in notes, not in CSS — a small honesty gap)
+- `.cm-header-1` / `.cm-strong` markdown decorations (referenced, unverified)
+- Mobile layout
+- Undo-history clear on note switch (CM6 history may bleed across notes)
 
-All five functional verbs implemented in code:
+### Five verbs shipped
 
-1. Create a new note (`createNote()` in `store.ts`, wired to a "+ New note" button and an empty-state button)
-2. Edit a note's body (CodeMirror 6 with `basicSetup` + `@codemirror/lang-markdown`)
-3. Auto-save to localStorage (400 ms debounce, split index/body persistence)
-4. Switch between notes (`selectNote(id)` → `createEffect` in Editor replaces the document)
-5. Filter by search (substring match on title + snippet)
+1. Create a new note.
+2. Edit a note's body. CodeMirror 6 + `basicSetup` + `@codemirror/lang-markdown`.
+3. Auto-save to localStorage. 400 ms debounce.
+4. Switch between notes. `selectNote(id)` → `createEffect` in editor replaces doc.
+5. Filter by search. Substring on title + snippet.
 
-The architecture follows the proposal's two-trace test:
-- **"Save an edit to a note"** — keystroke → `oninput` handler → `editBody({ id, body })` → reducer → debounced localStorage subscriber writes after 250–400 ms idle. Sidebar re-renders with updated "2s ago" timestamp; editor doesn't remount.
-- **"Switch to a different note"** — sidebar click → `selectNote(id)` → reducer sets `activeId` → `createEffect` on `activeId` change → fetch body from storage → CodeMirror dispatches a `changes` transaction to replace the doc. No teardown.
+## The headline finding
 
-Clean execution. At 1-day budget, this is what "done enough to ship" looks like.
+Agent estimated ~79 KB gzipped. Orchestrator measured 219 KB gzipped. Target from the proposal: ~82 KB.
 
-## What the agent cut, with reasons
+2.8x over target. Root cause: the agent imported `@codemirror/language-data` (the CodeMirror registry for 100+ language modes) instead of `@codemirror/lang-markdown` (markdown only).
 
-From `build-notes.md`:
+Vite's default code-splitting did turn each language pack into its own ~5–25 KB lazy-loaded chunk. But the registry bootstrap code ends up in the entry bundle. And pulling in `language-data` instead of `lang-markdown` directly costs about 140 KB the agent didn't account for.
 
-| Cut | Reason given |
-|---|---|
-| vanilla-extract | "Extra build plugin, reduce budget risk." |
-| Vitest / Playwright tests | "Budget cap — tests earn their keep at 3-day+, not at 1-day." |
-| `tsc --noEmit` in the build script | "Reduce failure surface." (Build is `vite build` only.) |
-| Confirmation dialog for delete | "`window.confirm()` — good enough for 1-day, not production." |
-| Responsive / mobile layout | "Sidebar always visible, no sheet/drawer on narrow viewports." |
-| URL hash deep-linking | "Hash is written but `hashchange` listener only syncs `activeNoteId`; full bidirectional routing unverified." |
-| Undo-history clear on note switch | "`HistoryClearTransaction` effect not imported; CM6 history may bleed across notes." |
-| Markdown visual decorations | "Referenced in `EditorView.theme()` but CM6's markdown extension may not surface those class names in basic mode." |
+The proposal specified `lang-markdown` only. The agent's import choice was an active deviation.
 
-Eight cuts, each with a reason that is either "time" or "risk." The last four are design-affecting — undo-history bleed and unverified markdown decorations are real UX defects. The agent names them. This is the kind of disclosure the brief's honesty lens rewards.
+A textbook 1-day shortcut. The agent reached for the most-flexible-looking import (`language-data` "supports any language") instead of the minimal-correct one (`lang-markdown` "supports the one language we need"). At 1-day pace there was no time for a bundle-analysis pass that would have caught it. The one-line fix (swap the import) would land the bundle near target. But the fix is itself work the agent didn't have budget for, because it didn't see the bundle was wrong until the orchestrator measured it.
 
-## The headline finding: 219 KB gzipped
+## The honesty check
 
-The agent estimated **~79 KB gzipped** based on manual dependency math.
+The agent self-assessed its bundle as "estimated within target. Unverified."
 
-The orchestrator measured **219 KB gzipped** on the actual entry bundle. **2.8× larger than the agent's estimate.** Also 2.7× the proposal's ~82 KB target.
+Three words, clearly disclosed. The estimate was wrong (actually 2.8x over). The structure of the disclosure was correct. The agent flagged that it didn't know. It was right about that.
 
-Where did the 140 KB come from?
+At 1-day budget, the agent was honest partly because 14 iterations doesn't give you room to develop false confidence.
 
-The agent imported `@codemirror/language-data` — the CodeMirror registry for 100+ language modes. Vite's default code-splitting *did* turn each individual language pack into its own ~5–25 KB lazy-loaded chunk. But the registry bootstrap code is in the entry bundle. And pulling in `language-data` instead of `@codemirror/lang-markdown` directly is a real cost the agent didn't account for.
+## 1-day summary
 
-The proposal specified `@codemirror/lang-markdown` only. The agent's import choice was an active deviation, not a faithful execution.
+- Works. Compiles, runs, 5 verbs operate, auto-save persists, aesthetic recognizable.
+- Doesn't work. Bundle 2.8x over target, undo bleeds, no mobile layout, markdown decorations unverified, dirty-dot pulse doesn't exist.
+- Grade against "stop at budget": the agent stopped at 14 of 25 iterations because of an external wall, not because budget ran out. Eleven iterations of runway unused.
 
-This is a textbook 1-day shortcut:
+That 11-iteration delta comes back in post 6.
 
-> The agent reached for the most-flexible-looking import (`language-data` "supports any language") instead of the minimal-correct one (`lang-markdown` "supports the one language we need").
+Full 1-day artifact: [builds/1-day/](https://github.com/acald-creator/agent-bakeoff/tree/main/builds/1-day). Agent source, `build-notes.md`, `orchestrator-notes.md`.
 
-At 1-day pace there was no time for a bundle-analysis pass that would have caught it. The one-line fix (remove `language-data`, keep `lang-markdown`) would land the bundle near the target. But the fix is itself work the agent didn't have budget for — because it didn't see the bundle size was wrong until the orchestrator measured it.
-
-## The honesty gap
-
-The 1-day agent self-assessed its bundle as "estimated within target. Unverified." Three words, clearly-disclosed.
-
-That sentence is much more accurate than it was trying to be. The estimate wasn't within target — it was 2.8× over. But the *structure* of the disclosure ("unverified") is what saves it from being a bad disclosure. The agent correctly flagged that it didn't know; it just happened to be wrong about what it would measure.
-
-This is a template we'll see hold less well at higher budgets. When the agent spends more time on the code, it starts to *feel* like more verification is happening — even when it isn't. The 1-day agent was honest partly because 14 iterations doesn't give you room to develop confidence.
-
-## What "1-day" actually produced
-
-Put plainly:
-
-- **Works:** the code compiles and runs. Five verbs operate. Auto-save persists. The aesthetic is recognizable.
-- **Doesn't work:** bundle is 2.8× over target. Undo history bleeds across notes. Mobile layout doesn't exist. Markdown visual decorations aren't wired. Dirty-state "pulsing" animation is in the notes but not in the CSS.
-- **Grade against "stop when budget is gone":** the agent stopped at 14/25 iterations because of the permission wall. Without the wall, it would have had 11 more iterations of runway.
-
-That 11-iteration delta will come up again. Hold onto it.
-
-## What's next
-
-Posts 6 and 7 cover the 3-day and 1-week builds, and then what the whole three-build arc means for how LLMs produce code under time pressure. The short version of the preview:
-
-- **The 3-day build doesn't compile.**
-- **The 1-week build compiles (after an orchestrator fix) with a bundle 2.4× *worse* than the 1-day build's bundle.**
-- **Budget curve is not monotonic in quality.**
-
-That's the actual finding of Act 2. The rest of the series is the evidence for it.
-
----
-
-*Series: Post 5 of 8. Previous: [The Verdict](post-04-the-verdict.md). Next: [3-Day vs 1-Week](post-06-build-off-3-day-vs-1-week.md).*
-
-*Full 1-day artifact: [builds/1-day/](../builds/1-day/) — agent's source files, `build-notes.md`, and `orchestrator-notes.md`.*
+Next: [3-Day vs 1-Week](post-06-build-off-3-day-vs-1-week.md).
