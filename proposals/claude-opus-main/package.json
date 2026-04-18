@@ -1,0 +1,29 @@
+{
+  "name": "agent-bakeoff-claude-opus-main",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "inferno": "^8.2.0",
+    "inferno-hyperscript": "^8.2.0",
+    "type-to-reducer": "^1.2.0",
+    "remeda": "^2.0.0",
+    "codemirror": "^6.0.1",
+    "@codemirror/lang-markdown": "^6.2.0",
+    "idb-keyval": "^6.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "vite": "^6.0.0",
+    "vite-plugin-inferno": "^5.0.0",
+    "vitest": "^2.0.0",
+    "@playwright/test": "^1.48.0"
+  }
+}

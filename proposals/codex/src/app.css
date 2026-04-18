@@ -1,0 +1,20 @@
+:root {
+  --bg: #f5f1e8;
+  --panel: #fffdf8;
+  --line: #d7cec0;
+  --text: #2c261f;
+  --accent: #8a5a2b;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.5 ui-sans-serif, system-ui, sans-serif;
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 18rem 1fr;
+  min-height: 100vh;
+}
